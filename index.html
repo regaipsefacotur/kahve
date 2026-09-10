@@ -350,21 +350,22 @@ function adim5(){
   kalpler(24);
   const dt=new Date(state.tarih);
   const gun=dt.toLocaleDateString('tr-TR',{day:'numeric',month:'long',weekday:'long'});
-  const mekanYazi=state.mekan==='Sen karar ver'?'Sürpriz — sen karar ver 🎲':state.mekan;
+  const mekanGosterim=state.mekan==='Sen karar ver'?'Sürpriz — sen karar ver 🎲':state.mekan;
+  const mekanYazi=state.mekan==='Sen karar ver'?'Sen karar ver, surpriz olsun':state.mekan;
   const mesaj=encodeURIComponent(
-`Peki peki, ikna oldum 🙄☕
+`Peki peki, ikna oldum :)
 
-📅 ${gun}
-⏰ ${state.saat}
-☕ ${state.icecek}
-📍 ${mekanYazi}
+Gun: ${gun}
+Saat: ${state.saat}
+Icecek: ${state.icecek}
+Mekan: ${mekanYazi}
 
-Bir insan kahveye davet etmek için site mi yapar ya 😭 Mesaj atsaydın "bakarım" derdim. Ama bu çabaya hayır diyemiyorum, teslim 👏
+Bir insan kahveye davet etmek icin site mi yapar ya :D Mesaj atsaydin "bakarim" derdim. Ama bu cabaya hayir diyemiyorum, teslim.
 
-O kaçan butonu yakalamaya çalıştım bu arada — küçüldü, kaçtı, benle dalga geçti. Senin kadar inatçı 😤😂
+O kacan butonu yakalamaya calistim bu arada - kucukdu, kacti, benle dalga gecti. Senin kadar inatci :)
 
-Neyse. Geç kalma, bekletme, kahvem soğumasın ☕
-Görüşürüz ✨`);
+Neyse. Gec kalma, bekletme, kahvem sogumasin.
+Gorusuruz!`);
   card.innerHTML=`
     <div class="ticket">
       <p class="eyebrow">Onaylandı</p>
@@ -375,7 +376,7 @@ Görüşürüz ✨`);
         <div class="row"><dt>Gün</dt><dd>${gun}</dd></div>
         <div class="row"><dt>Saat</dt><dd>${state.saat}</dd></div>
         <div class="row"><dt>Kahven</dt><dd>${state.icecek}</dd></div>
-        <div class="row"><dt>Mekân</dt><dd>${mekanYazi}</dd></div>
+        <div class="row"><dt>Mekân</dt><dd>${mekanGosterim}</dd></div>
       </dl>
     </div>
     <br>
