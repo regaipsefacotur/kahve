@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kahve içelim mi?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --blush:#F6E2E7; --blush-deep:#E9CCDC; --card:#FFFCF6;
+    --ink:#43202D; --ink-soft:#8B6675;
+    --rose:#B93E66; --rose-soft:#F0C5D4; --gold:#B9954F;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:'DM Sans',system-ui,sans-serif;color:var(--ink);
+    background:radial-gradient(120% 90% at 20% 0%,#FCEFF3 0,transparent 60%),
+               linear-gradient(160deg,var(--blush),var(--blush-deep));
+    min-height:100dvh;display:grid;place-items:center;
+    padding:28px 18px 44px;overflow-x:hidden;
+  }
+  .sky{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:0}
+  .sky span{position:absolute;bottom:-40px;color:var(--rose);opacity:.26;font-size:14px;animation:rise linear infinite}
+  @keyframes rise{0%{transform:translateY(0) rotate(0);opacity:0}12%{opacity:.3}100%{transform:translateY(-115dvh) rotate(220deg);opacity:0}}
+
+  #konfeti{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:999}
+  #konfeti i{position:absolute;display:block;border-radius:1px}
+
+  .card{position:relative;z-index:1;width:100%;max-width:430px;background:var(--card);
+    border-radius:24px;padding:38px 32px 32px;text-align:center;
+    box-shadow:0 26px 64px -30px rgba(67,32,45,.5),0 2px 0 rgba(255,255,255,.7) inset;
+    animation:pop .55s cubic-bezier(.2,.9,.3,1.15) both}
+  @keyframes pop{from{opacity:0;transform:translateY(16px) scale(.97)}to{opacity:1;transform:none}}
+
+  .eyebrow{font-size:10.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin-bottom:14px}
+  .avatar{width:100px;height:100px;border-radius:50%;object-fit:cover;border:5px solid #fff;
+    box-shadow:0 12px 26px -14px rgba(67,32,45,.55);margin:0 auto 18px;display:block;background:var(--rose-soft)}
+  .art{width:104px;height:104px;margin:0 auto 18px;display:block}
+
+  h1{font-family:'Fraunces',Georgia,serif;font-weight:600;font-size:clamp(23px,6vw,29px);
+    line-height:1.28;letter-spacing:-.015em;margin-bottom:10px;text-wrap:balance}
+  .sub{font-size:14px;line-height:1.55;color:var(--ink-soft);margin-bottom:26px;text-wrap:balance}
+  .fine{font-family:'Fraunces',serif;font-style:italic;font-size:13.5px;color:var(--ink-soft);line-height:1.65;margin:16px 2px 0}
+
+  button,.btn{font-family:inherit;cursor:pointer;border:0}
+  .btn{display:block;width:100%;background:linear-gradient(180deg,#CB4E76,var(--rose));color:#fff;
+    font-size:16px;font-weight:500;padding:16px;border-radius:100px;text-decoration:none;
+    box-shadow:0 14px 26px -13px rgba(185,62,102,.95);transition:transform .16s,box-shadow .16s}
+  .btn:hover{transform:translateY(-2px)}
+  .btn:active{transform:translateY(1px)}
+  .btn[disabled]{opacity:.35;cursor:not-allowed;transform:none;box-shadow:none}
+  .ghost{display:inline-block;margin-top:13px;font-size:13.5px;color:var(--rose);
+    text-decoration:none;border-bottom:1px solid var(--rose-soft);padding-bottom:2px;background:none}
+
+  .no-btn{position:fixed;z-index:50;background:#EBDEE5;color:var(--ink-soft);font-size:15px;
+    padding:13px 28px;border-radius:100px;
+    transition:left .3s cubic-bezier(.3,1.4,.5,1),top .3s cubic-bezier(.3,1.4,.5,1),transform .25s}
+
+  label{display:block;text-align:left;font-size:12.5px;font-weight:500;margin:0 2px 8px;color:var(--ink)}
+  input[type=date],select{width:100%;font-family:inherit;font-size:15px;color:var(--ink);
+    background:#FDF6F8;border:1.5px solid var(--rose-soft);padding:14px;border-radius:13px;
+    margin-bottom:18px;appearance:none}
+  input[type=date]:focus,select:focus{outline:2px solid var(--rose);outline-offset:1px}
+
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:24px}
+  .tile{background:#FBF3F6;border:1.5px solid transparent;border-radius:15px;padding:15px 5px 12px;
+    font-size:11.5px;color:var(--ink-soft);transition:all .18s}
+  .tile b{display:block;font-size:25px;margin-bottom:7px;font-weight:400}
+  .tile:hover{transform:translateY(-2px)}
+  .tile[aria-pressed=true]{border-color:var(--rose);background:#FDEAF1;color:var(--ink);font-weight:500}
+
+  .ticket{position:relative}
+  .stub{border-top:1.5px dashed var(--rose-soft);margin-top:22px;padding-top:18px;text-align:left}
+  .row{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:8px 0}
+  .row dt{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);white-space:nowrap}
+  .row dd{font-family:'Fraunces',serif;font-weight:600;font-size:15px;text-align:right}
+
+  .steps{display:flex;gap:6px;justify-content:center;margin-top:24px}
+  .dot{width:6px;height:6px;border-radius:50%;background:var(--rose-soft);transition:width .3s}
+  .dot.on{background:var(--rose);width:18px;border-radius:3px}
+  .hide{display:none}
+
+  /* çizim animasyonları */
+  .steam{animation:steam 3s ease-in-out infinite}
+  .steam:nth-child(2){animation-delay:.5s}
+  .steam:nth-child(3){animation-delay:1s}
+  @keyframes steam{0%,100%{opacity:.25;transform:translateY(2px)}50%{opacity:.7;transform:translateY(-3px)}}
+  .sway{animation:sway 4s ease-in-out infinite;transform-origin:50% 60%}
+  @keyframes sway{0%,100%{transform:rotate(-2deg)}50%{transform:rotate(2deg)}}
+  .twinkle{animation:tw 2.4s ease-in-out infinite}
+  .twinkle:nth-of-type(even){animation-delay:1.2s}
+  @keyframes tw{0%,100%{opacity:.2}50%{opacity:.9}}
+
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.sky,#konfeti{display:none}}
+</style>
+</head>
+<body>
+<div class="sky" id="sky" aria-hidden="true"></div>
+<div id="konfeti" aria-hidden="true"></div>
+<main class="card" id="card"></main>
+<button class="no-btn hide" id="noBtn">hayır</button>
+
+<script>
+/* ═════════ SADECE BU BLOĞU DEĞİŞTİR ═════════ */
+const CONFIG = {
+  isim:    "Handenur",             // 1 · Teklif ettiğin kişinin adı
+  foto:    "",                 // 2 · Fotoğraf linki — boş bırakırsan çizim görünür
+  telefon: "905322101161",     // 3 · Senin numaran (başında 90, sıfırsız)
+  saatler: ["14:00","15:00","16:00","17:00","18:00"],
+  kapanis: "Anlaştık sayılır.",
+  imza:    "Normal insanlar mesaj atar. Ben öğle arasında oturup sana bir site yaptım. Abartmayalım."
+};
+/* ══════════════════════════════════════════ */
+
+const icecekler=[{e:"☕",t:"Türk kahvesi"},{e:"🥛",t:"Latte"},{e:"🫖",t:"Filtre"},
+  {e:"🍵",t:"Matcha"},{e:"🍫",t:"Sıcak çikolata"},{e:"🧊",t:"Soğuk bir şey"}];
+const state={tarih:"",saat:"",icecek:""};
+const card=document.getElementById('card'), noBtn=document.getElementById('noBtn');
+let kacis=0;
+
+const laflar=["hayır","emin misin?","bir daha düşün","cidden mi?","ama plan yapmıştım",
+  "yakalayamazsın","hâlâ mı?","biraz yoruldum","tekrar dene","olmayacak","ısrarcısın",
+  "bak sıkıldım","hiç şansın yok","peki, kovala"];
+
+/* ── çizimler ── */
+const ART = {
+  zarf:`<svg class="art sway" viewBox="0 0 100 100" fill="none">
+    <rect x="12" y="28" width="76" height="52" rx="7" fill="#fff" stroke="var(--rose)" stroke-width="2"/>
+    <path d="M12 34l38 27 38-27" stroke="var(--rose)" stroke-width="2" stroke-linecap="round"/>
+    <path d="M12 76l26-21M88 76L62 55" stroke="var(--rose-soft)" stroke-width="2" stroke-linecap="round"/>
+    <circle cx="50" cy="55" r="13" fill="var(--rose)"/>
+    <path d="M50 61c-4-3.2-7-5.4-7-8.4a3.6 3.6 0 016.2-2.3l.8.9.8-.9a3.6 3.6 0 016.2 2.3c0 3-3 5.2-7 8.4z" fill="#FFFCF6"/>
+    <g fill="var(--gold)">
+      <circle class="twinkle" cx="22" cy="19" r="2.2"/>
+      <circle class="twinkle" cx="80" cy="16" r="1.8"/>
+      <circle class="twinkle" cx="66" cy="24" r="1.4"/>
+    </g></svg>`,
+
+  fincan:`<svg class="art" viewBox="0 0 100 100" fill="none">
+    <g stroke="var(--rose)" stroke-width="2" stroke-linecap="round">
+      <path class="steam" d="M40 26c3-4-3-7 0-11"/>
+      <path class="steam" d="M50 24c3-4-3-8 0-12"/>
+      <path class="steam" d="M60 26c3-4-3-7 0-11"/>
+    </g>
+    <path d="M26 44h48v16a20 20 0 01-20 20h-8a20 20 0 01-20-20V44z" fill="#fff" stroke="var(--rose)" stroke-width="2"/>
+    <path d="M74 50h5a9 9 0 010 18h-5" stroke="var(--rose)" stroke-width="2"/>
+    <path d="M26 44h48" stroke="var(--rose)" stroke-width="2"/>
+    <path d="M31 55c8 3 14 3 19 0s12-3 19 0" stroke="var(--rose-soft)" stroke-width="2"/>
+    <path d="M18 86h64" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round"/></svg>`,
+
+  takvim:`<svg class="art sway" viewBox="0 0 100 100" fill="none">
+    <rect x="16" y="24" width="68" height="62" rx="9" fill="#fff" stroke="var(--rose)" stroke-width="2"/>
+    <path d="M16 41h68" stroke="var(--rose)" stroke-width="2"/>
+    <path d="M33 18v13M67 18v13" stroke="var(--rose)" stroke-width="3" stroke-linecap="round"/>
+    <g fill="var(--rose-soft)">
+      <circle cx="33" cy="54" r="3.4"/><circle cx="50" cy="54" r="3.4"/><circle cx="67" cy="54" r="3.4"/>
+      <circle cx="33" cy="70" r="3.4"/><circle cx="67" cy="70" r="3.4"/>
+    </g>
+    <circle cx="50" cy="70" r="9" fill="var(--rose)"/>
+    <path d="M46 70l3 3 5-6" stroke="#FFFCF6" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+
+  bilet:`<svg class="art" viewBox="0 0 100 100" fill="none">
+    <circle cx="50" cy="50" r="30" fill="#fff" stroke="var(--gold)" stroke-width="2"/>
+    <circle cx="50" cy="50" r="24" stroke="var(--rose-soft)" stroke-width="1.5" stroke-dasharray="3 4"/>
+    <path d="M38 51l8 8 17-19" stroke="var(--rose)" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+    <g fill="var(--gold)">
+      <circle class="twinkle" cx="17" cy="30" r="2.4"/><circle class="twinkle" cx="85" cy="34" r="2"/>
+      <circle class="twinkle" cx="24" cy="76" r="1.8"/><circle class="twinkle" cx="80" cy="72" r="2.4"/>
+    </g></svg>`
+};
+const gorsel=()=>CONFIG.foto?`<img class="avatar" src="${CONFIG.foto}" alt="">`:ART.zarf;
+const noktalar=n=>`<div class="steps">${[0,1,2,3,4].map(i=>`<i class="dot ${i===n?'on':''}"></i>`).join('')}</div>`;
+const geri=fn=>{const g=document.getElementById('geri'); if(g) g.onclick=e=>{e.preventDefault();fn()}};
+
+/* ── kaçan buton: asla pes etmez ── */
+function yerlestir(){
+  const c=card.getBoundingClientRect();
+  noBtn.style.left=(c.left+c.width/2-52)+'px';
+  noBtn.style.top=Math.min(c.bottom+16,innerHeight-72)+'px';
+}
+function sifirlaNo(){
+  kacis=0;
+  noBtn.textContent=laflar[0];
+  noBtn.style.transform='none';
+  noBtn.classList.remove('hide');
+  yerlestir();
+}
+function kac(){
+  kacis++;
+  noBtn.textContent=laflar[kacis%laflar.length];
+  const p=18,w=noBtn.offsetWidth,h=noBtn.offsetHeight;
+  noBtn.style.left=(p+Math.random()*(innerWidth-w-p*2))+'px';
+  noBtn.style.top=(p+Math.random()*(innerHeight-h-p*2))+'px';
+  noBtn.style.transform='scale('+(0.74+Math.abs(Math.sin(kacis))*0.14)+')';
+}
+noBtn.addEventListener('mouseenter',kac);
+noBtn.addEventListener('click',e=>{e.preventDefault();kac()});
+noBtn.addEventListener('touchstart',e=>{e.preventDefault();kac()},{passive:false});
+
+/* ── 0 · giriş ── */
+function adim0(){
+  card.innerHTML=`
+    <p class="eyebrow">Bir dakikanı alacak</p>
+    ${gorsel()}
+    <h1>${CONFIG.isim}, sana bir şey sorabilir miyim?</h1>
+    <p class="sub">Kötü bir şey değil, söz. Sadece iki buton var, birine güvenme.</p>
+    <button class="btn" id="evet">Sor bakalım</button>
+    ${noktalar(0)}`;
+  sifirlaNo();
+  document.getElementById('evet').onclick=adim1;
+}
+
+/* ── 1 · teklif ── */
+function adim1(){
+  card.innerHTML=`
+    <p class="eyebrow">Soru şu</p>
+    ${ART.fincan}
+    <h1>Bir kahve içmeye ne dersin?</h1>
+    <p class="sub">Büyük bir mesele değil. Yine iki seçenek var, biri hâlâ kaçıyor.</p>
+    <button class="btn" id="evet">Olur, içelim</button>
+    <a class="ghost" href="#" id="geri">← Geri</a>
+    ${noktalar(1)}`;
+  sifirlaNo();
+  document.getElementById('evet').onclick=()=>{noBtn.classList.add('hide');kalpler(16);adim2()};
+  geri(adim0);
+}
+
+/* ── 2 · gün ── */
+function adim2(){
+  noBtn.classList.add('hide');
+  card.innerHTML=`
+    <p class="eyebrow">Adım bir</p>
+    ${ART.takvim}
+    <h1>Hangi gün müsaitsin?</h1>
+    <p class="sub">Sen bir gün söyle, kalanını ben ayarlarım.</p>
+    <label for="t">Gün</label><input type="date" id="t" value="${state.tarih}">
+    <label for="s">Saat</label>
+    <select id="s"><option value="">Seç</option>${CONFIG.saatler.map(x=>`<option ${x===state.saat?'selected':''}>${x}</option>`).join('')}</select>
+    <button class="btn" id="ileri">Devam et</button>
+    <a class="ghost" href="#" id="geri">← Geri</a>
+    ${noktalar(2)}`;
+  const t=document.getElementById('t'),s=document.getElementById('s'),b=document.getElementById('ileri');
+  t.min=new Date().toISOString().split('T')[0];
+  const kontrol=()=>b.disabled=!(t.value&&s.value);
+  t.onchange=s.onchange=kontrol; kontrol();
+  b.onclick=()=>{state.tarih=t.value;state.saat=s.value;adim3()};
+  geri(adim1);
+}
+
+/* ── 3 · içecek ── */
+function adim3(){
+  card.innerHTML=`
+    <p class="eyebrow">Adım iki</p>
+    ${ART.fincan}
+    <h1>Ne içiyorsun?</h1>
+    <p class="sub">Mekânı buna göre seçeceğim, o yüzden dikkatli ol.</p>
+    <div class="grid">${icecekler.map((y,i)=>`<button class="tile" data-i="${i}" aria-pressed="${y.t===state.icecek}"><b>${y.e}</b>${y.t}</button>`).join('')}</div>
+    <button class="btn" id="bitir" ${state.icecek?'':'disabled'}>Tamamdır</button>
+    <a class="ghost" href="#" id="geri">← Geri</a>
+    ${noktalar(3)}`;
+  const b=document.getElementById('bitir');
+  card.querySelectorAll('.tile').forEach(el=>el.onclick=()=>{
+    card.querySelectorAll('.tile').forEach(o=>o.setAttribute('aria-pressed','false'));
+    el.setAttribute('aria-pressed','true');
+    state.icecek=icecekler[el.dataset.i].t; b.disabled=false;
+  });
+  b.onclick=()=>{patlat();adim4()};
+  geri(adim2);
+}
+
+/* ── 4 · onay ── */
+function adim4(){
+  kalpler(24);
+  const dt=new Date(state.tarih);
+  const gun=dt.toLocaleDateString('tr-TR',{day:'numeric',month:'long',weekday:'long'});
+  const mesaj=encodeURIComponent(
+`Tamam, kabul ediyorum ☕
+
+${gun} · ${state.saat}
+Benimki ${state.icecek.toLowerCase()} olsun, not aldın değil mi?
+
+Şimdi bak: sırf bana site kurduğun için evet dedim sanma. Ama kurmasaydın bu kadar hızlı da demezdim. İyi düşünmüşsün 😌
+
+Kaçan butonu yakalamaya çalıştım bu arada. Olmadı.`);
+  card.innerHTML=`
+    <div class="ticket">
+      <p class="eyebrow">Onaylandı</p>
+      ${ART.bilet}
+      <h1>${CONFIG.kapanis}<br>${state.saat}'de görüşürüz.</h1>
+      <p class="fine">${CONFIG.imza}</p>
+      <dl class="stub">
+        <div class="row"><dt>Gün</dt><dd>${gun}</dd></div>
+        <div class="row"><dt>Saat</dt><dd>${state.saat}</dd></div>
+        <div class="row"><dt>Kahven</dt><dd>${state.icecek}</dd></div>
+      </dl>
+    </div>
+    <br>
+    <a class="btn" href="https://wa.me/${CONFIG.telefon}?text=${mesaj}" target="_blank" rel="noopener">Cevabımı gönder</a>
+    <a class="ghost" href="${takvimLinki(dt)}" target="_blank" rel="noopener">📅 Takvimime ekle</a><br>
+    <a class="ghost" href="#" id="geri">← Seçimimi değiştir</a>
+    ${noktalar(4)}`;
+  geri(adim3);
+}
+
+/* ── konfeti ── */
+function patlat(){
+  const kutu=document.getElementById('konfeti');
+  const renkler=['#B93E66','#E8A0BB','#C89B5A','#7E4E63','#F0C5D4','#FFFCF6'];
+  const kaynaklar=[[.5,.55],[.15,.45],[.85,.45]];
+  kaynaklar.forEach((k,i)=>setTimeout(()=>{
+    for(let j=0;j<60;j++){
+      const el=document.createElement('i');
+      const en=5+Math.random()*6, boy=8+Math.random()*9;
+      el.style.cssText=`left:${k[0]*100}%;top:${k[1]*100}%;width:${en}px;height:${boy}px;
+        background:${renkler[j%renkler.length]}`;
+      kutu.appendChild(el);
+      const aci=Math.random()*Math.PI*2, guc=140+Math.random()*260;
+      const x=Math.cos(aci)*guc, y=Math.sin(aci)*guc-160;
+      const sure=1600+Math.random()*1400;
+      el.animate([
+        {transform:'translate(0,0) rotate(0deg)',opacity:1},
+        {transform:`translate(${x*.6}px,${y*.75}px) rotate(${180+Math.random()*360}deg)`,opacity:1,offset:.45},
+        {transform:`translate(${x}px,${innerHeight*.75}px) rotate(${540+Math.random()*540}deg)`,opacity:0}
+      ],{duration:sure,easing:'cubic-bezier(.15,.6,.5,1)',fill:'forwards'});
+      setTimeout(()=>el.remove(),sure+80);
+    }
+  },i*170));
+}
+
+function takvimLinki(dt){
+  const [h,m]=state.saat.split(':');
+  const bas=new Date(dt); bas.setHours(+h,+m,0,0);
+  const bit=new Date(bas.getTime()+1.5*36e5);
+  const f=d=>d.toISOString().replace(/[-:]|\.\d{3}/g,'');
+  const detay=encodeURIComponent('Kahve randevusu ☕ — '+state.icecek);
+  return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent('Kahve ☕')}&dates=${f(bas)}/${f(bit)}&details=${detay}`;
+}
+
+function kalpler(n){
+  for(let i=0;i<n;i++){
+    const h=document.createElement('span'); h.textContent='♥';
+    h.style.cssText=`left:${Math.random()*100}vw;font-size:${12+Math.random()*20}px;
+      animation-duration:${3.5+Math.random()*3}s;animation-delay:${Math.random()*1.4}s;opacity:.45`;
+    sky.appendChild(h); setTimeout(()=>h.remove(),8500);
+  }
+}
+(function(){for(let i=0;i<9;i++){
+  const h=document.createElement('span'); h.textContent='♥';
+  h.style.cssText=`left:${Math.random()*100}vw;font-size:${10+Math.random()*11}px;
+    animation-duration:${10+Math.random()*7}s;animation-delay:${Math.random()*9}s`;
+  sky.appendChild(h);}})();
+
+addEventListener('resize',()=>{if(!noBtn.classList.contains('hide')&&kacis===0)yerlestir()});
+adim0();
+</script>
+</body>
+</html>
