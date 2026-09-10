@@ -353,18 +353,14 @@ function adim5(){
   const mekanGosterim=state.mekan==='Sen karar ver'?'Sürpriz — sen karar ver 🎲':state.mekan;
   const mekanYazi=state.mekan==='Sen karar ver'?'Sen karar ver, surpriz olsun':state.mekan;
   const mesaj=encodeURIComponent(
-`Peki peki, ikna oldum :)
+`Peki, ikna oldum :)
 
 Gun: ${gun}
 Saat: ${state.saat}
 Icecek: ${state.icecek}
 Mekan: ${mekanYazi}
 
-Bir insan kahveye davet etmek icin site mi yapar ya :D Mesaj atsaydin "bakarim" derdim. Ama bu cabaya hayir diyemiyorum, teslim.
-
-O kacan butonu yakalamaya calistim bu arada - kucukdu, kacti, benle dalga gecti. Senin kadar inatci :)
-
-Neyse. Gec kalma, bekletme, kahvem sogumasin.
+Gec kalma, kahvem sogumasin.
 Gorusuruz!`);
   card.innerHTML=`
     <div class="ticket">
