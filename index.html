@@ -65,7 +65,8 @@
   input[type=date]:focus,select:focus,input[type=text]:focus{outline:2px solid var(--rose);outline-offset:1px}
   input[type=text]::placeholder{color:var(--ink-soft);opacity:.6}
 
-  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:24px}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:24px;justify-items:center}
+  .grid .tile{width:100%}
   .grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px}
   .tile{background:#FBF3F6;border:1.5px solid transparent;border-radius:15px;padding:15px 5px 12px;
     font-size:11.5px;color:var(--ink-soft);transition:all .18s}
@@ -114,13 +115,13 @@ const CONFIG = {
   foto:    "",
   telefon: "905322101161",
   saatler: ["12:00","13:00","14:00","15:00","16:00","17:00","18:00","19:00","20:00","21:00","22:00"],
-  kapanis: "Anlaştık sayılır.",
-  imza:    "Normal insanlar mesaj atar. Ben öğle arasında oturup sana bir site yaptım. Abartmayalım."
+  kapanis: "Anlaştık sayılır 🤝",
+  imza:    "Normal insanlar mesaj atar. Ben oturup sana site yaptım. Abartmıyorum, sadece çabamı gösteriyorum 😌✨"
 };
 /* ══════════════════════════════════════════ */
 
 const icecekler=[{e:"☕",t:"Türk kahvesi"},{e:"🥛",t:"Latte"},{e:"🫖",t:"Filtre"},
-  {e:"🍵",t:"Matcha"},{e:"🍫",t:"Sıcak çikolata"},{e:"🧊",t:"Soğuk bir şey"}];
+  {e:"🖤",t:"Amerikano"},{e:"🍵",t:"Matcha"},{e:"🍫",t:"Sıcak çikolata"},{e:"🧊",t:"Soğuk bir şey"}];
 
 const mekanlar=[
   {e:"🏡",t:"Sakin bir kafe"},
@@ -135,9 +136,9 @@ const state={tarih:"",saat:"",icecek:"",mekan:"",mekanOzel:""};
 const card=document.getElementById('card'), noBtn=document.getElementById('noBtn');
 let kacis=0;
 
-const laflar=["hayır","emin misin?","bir daha düşün","cidden mi?","ama plan yapmıştım",
-  "yakalayamazsın","hâlâ mı?","biraz yoruldum","tekrar dene","olmayacak","ısrarcısın",
-  "bak sıkıldım","hiç şansın yok","peki, kovala"];
+const laflar=["hayır","emin misin?","bir daha düşün 🤔","cidden mi?","ama plan yapmıştım 😢",
+  "yakalayamazsın 🏃‍♂️","hâlâ mı?","biraz yoruldum","tekrar dene","olmayacak 😤","ısrarcısın ha",
+  "bak sıkıldım 🥱","hiç şansın yok","peki kovala 😂","vaz mı geçtin?","hadi pes et","inatçı 😏"];
 
 const ADIM_SAYISI=6;
 
@@ -232,7 +233,7 @@ function adim0(){
     <p class="eyebrow">Bir dakikanı alacak</p>
     ${gorsel()}
     <h1>${CONFIG.isim}, sana bir şey sorabilir miyim?</h1>
-    <p class="sub">Kötü bir şey değil, söz. Sadece iki buton var, birine güvenme.</p>
+    <p class="sub">Kötü bir şey değil, söz. İki buton var ama birine çok güvenme, huysuz çıktı 😏</p>
     <button class="btn" id="evet">Sor bakalım</button>
     ${noktalar(0)}`;
   sifirlaNo();
@@ -245,7 +246,7 @@ function adim1(){
     <p class="eyebrow">Soru şu</p>
     ${ART.fincan}
     <h1>Bir kahve içmeye ne dersin?</h1>
-    <p class="sub">Büyük bir mesele değil. Yine iki seçenek var, biri hâlâ kaçıyor.</p>
+    <p class="sub">Büyük bir mesele değil, sadece iki fincan ve biraz sohbet ☕ O buton hâlâ kaçıyor bu arada, yakalamayı dene 😄</p>
     <button class="btn" id="evet">Olur, içelim</button>
     <a class="ghost" href="#" id="geri">← Geri</a>
     ${noktalar(1)}`;
@@ -261,7 +262,7 @@ function adim2(){
     <p class="eyebrow">Adım bir</p>
     ${ART.takvim}
     <h1>Hangi gün müsaitsin?</h1>
-    <p class="sub">Sen bir gün söyle, kalanını ben ayarlarım.</p>
+    <p class="sub">Sen bir gün söyle, gerisini bana bırak. Plancı tarafım devreye girdi bile 📋✨</p>
     <label for="t">Gün</label><input type="date" id="t" value="${state.tarih}">
     <label for="s">Saat</label>
     <select id="s"><option value="">Seç</option>${CONFIG.saatler.map(x=>`<option ${x===state.saat?'selected':''}>${x}</option>`).join('')}</select>
@@ -281,8 +282,8 @@ function adim3(){
   card.innerHTML=`
     <p class="eyebrow">Adım iki</p>
     ${ART.fincan}
-    <h1>Ne içiyorsun?</h1>
-    <p class="sub">Mekânı buna göre seçeceğim, o yüzden dikkatli ol.</p>
+    <h1>Ne içersin?</h1>
+    <p class="sub">Yanlış seçersen karşında yanlış mekân olur, düşünerek bas 🤔😄</p>
     <div class="grid">${icecekler.map((y,i)=>`<button class="tile" data-i="${i}" aria-pressed="${y.t===state.icecek}"><b>${y.e}</b>${y.t}</button>`).join('')}</div>
     <button class="btn" id="ileri" ${state.icecek?'':'disabled'}>Devam et</button>
     <a class="ghost" href="#" id="geri">← Geri</a>
@@ -305,7 +306,7 @@ function adim4(){
     <p class="eyebrow">Adım üç</p>
     ${ART.pin}
     <h1>Nerede buluşalım?</h1>
-    <p class="sub">Bir yer seç ya da aklındaki yeri yaz, gerisini bana bırak.</p>
+    <p class="sub">Bir yer seç ya da aklındaki yeri yaz. "Sen karar ver" de diyebilirsin, sürprizleri severim 🎁</p>
     <div class="grid2">${mekanlar.map((m,i)=>`<button class="tile" data-i="${i}" aria-pressed="${m.t===secili&&!ozelDeger}"><b>${m.e}</b>${m.t}</button>`).join('')}</div>
     <div class="veya">ya da</div>
     <input type="text" id="ozelMekan" placeholder="✏️ Şu kafe, şu ilçe, şu sokak…" value="${ozelDeger}">
@@ -351,15 +352,19 @@ function adim5(){
   const gun=dt.toLocaleDateString('tr-TR',{day:'numeric',month:'long',weekday:'long'});
   const mekanYazi=state.mekan==='Sen karar ver'?'Sürpriz — sen karar ver 🎲':state.mekan;
   const mesaj=encodeURIComponent(
-`Tamam, kabul ediyorum ☕
+`Peki peki, ikna oldum 🙄☕
 
-${gun} · ${state.saat}
-Benimki ${state.icecek.toLowerCase()} olsun, not aldın değil mi?
-Mekân: ${mekanYazi}
+📅 ${gun}
+⏰ ${state.saat}
+☕ ${state.icecek}
+📍 ${mekanYazi}
 
-Şimdi bak: sırf bana site kurduğun için evet dedim sanma. Ama kurmasaydın bu kadar hızlı da demezdim. İyi düşünmüşsün 😌
+Bir insan kahveye davet etmek için site mi yapar ya 😭 Mesaj atsaydın "bakarım" derdim. Ama bu çabaya hayır diyemiyorum, teslim 👏
 
-Kaçan butonu yakalamaya çalıştım bu arada. Olmadı.`);
+O kaçan butonu yakalamaya çalıştım bu arada — küçüldü, kaçtı, benle dalga geçti. Senin kadar inatçı 😤😂
+
+Neyse. Geç kalma, bekletme, kahvem soğumasın ☕
+Görüşürüz ✨`);
   card.innerHTML=`
     <div class="ticket">
       <p class="eyebrow">Onaylandı</p>
