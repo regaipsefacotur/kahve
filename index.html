@@ -59,17 +59,22 @@
     transition:left .3s cubic-bezier(.3,1.4,.5,1),top .3s cubic-bezier(.3,1.4,.5,1),transform .25s}
 
   label{display:block;text-align:left;font-size:12.5px;font-weight:500;margin:0 2px 8px;color:var(--ink)}
-  input[type=date],select{width:100%;font-family:inherit;font-size:15px;color:var(--ink);
+  input[type=date],select,input[type=text]{width:100%;font-family:inherit;font-size:15px;color:var(--ink);
     background:#FDF6F8;border:1.5px solid var(--rose-soft);padding:14px;border-radius:13px;
     margin-bottom:18px;appearance:none}
-  input[type=date]:focus,select:focus{outline:2px solid var(--rose);outline-offset:1px}
+  input[type=date]:focus,select:focus,input[type=text]:focus{outline:2px solid var(--rose);outline-offset:1px}
+  input[type=text]::placeholder{color:var(--ink-soft);opacity:.6}
 
   .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:24px}
+  .grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px}
   .tile{background:#FBF3F6;border:1.5px solid transparent;border-radius:15px;padding:15px 5px 12px;
     font-size:11.5px;color:var(--ink-soft);transition:all .18s}
   .tile b{display:block;font-size:25px;margin-bottom:7px;font-weight:400}
   .tile:hover{transform:translateY(-2px)}
   .tile[aria-pressed=true]{border-color:var(--rose);background:#FDEAF1;color:var(--ink);font-weight:500}
+
+  .veya{font-size:12px;color:var(--ink-soft);margin-bottom:12px;display:flex;align-items:center;gap:12px}
+  .veya::before,.veya::after{content:'';flex:1;height:1px;background:var(--rose-soft)}
 
   .ticket{position:relative}
   .stub{border-top:1.5px dashed var(--rose-soft);margin-top:22px;padding-top:18px;text-align:left}
@@ -105,10 +110,10 @@
 <script>
 /* ═════════ SADECE BU BLOĞU DEĞİŞTİR ═════════ */
 const CONFIG = {
-  isim:    "Handenur",             // 1 · Teklif ettiğin kişinin adı
-  foto:    "",                 // 2 · Fotoğraf linki — boş bırakırsan çizim görünür
-  telefon: "905322101161",     // 3 · Senin numaran (başında 90, sıfırsız)
-  saatler: ["14:00","15:00","16:00","17:00","18:00"],
+  isim:    "Handenur",
+  foto:    "",
+  telefon: "905322101161",
+  saatler: ["12:00","13:00","14:00","15:00","16:00","17:00","18:00","19:00","20:00","21:00","22:00"],
   kapanis: "Anlaştık sayılır.",
   imza:    "Normal insanlar mesaj atar. Ben öğle arasında oturup sana bir site yaptım. Abartmayalım."
 };
@@ -116,13 +121,25 @@ const CONFIG = {
 
 const icecekler=[{e:"☕",t:"Türk kahvesi"},{e:"🥛",t:"Latte"},{e:"🫖",t:"Filtre"},
   {e:"🍵",t:"Matcha"},{e:"🍫",t:"Sıcak çikolata"},{e:"🧊",t:"Soğuk bir şey"}];
-const state={tarih:"",saat:"",icecek:""};
+
+const mekanlar=[
+  {e:"🏡",t:"Sakin bir kafe"},
+  {e:"🌊",t:"Sahil kenarı"},
+  {e:"🌳",t:"Açık hava, yeşillik"},
+  {e:"🏙️",t:"Şehir merkezi"},
+  {e:"☕",t:"Semtin kafesi"},
+  {e:"🎲",t:"Sen karar ver"}
+];
+
+const state={tarih:"",saat:"",icecek:"",mekan:"",mekanOzel:""};
 const card=document.getElementById('card'), noBtn=document.getElementById('noBtn');
 let kacis=0;
 
 const laflar=["hayır","emin misin?","bir daha düşün","cidden mi?","ama plan yapmıştım",
   "yakalayamazsın","hâlâ mı?","biraz yoruldum","tekrar dene","olmayacak","ısrarcısın",
   "bak sıkıldım","hiç şansın yok","peki, kovala"];
+
+const ADIM_SAYISI=6;
 
 /* ── çizimler ── */
 const ART = {
@@ -161,6 +178,16 @@ const ART = {
     <circle cx="50" cy="70" r="9" fill="var(--rose)"/>
     <path d="M46 70l3 3 5-6" stroke="#FFFCF6" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
 
+  pin:`<svg class="art sway" viewBox="0 0 100 100" fill="none">
+    <path d="M50 88s-26-22-26-42a26 26 0 0152 0c0 20-26 42-26 42z" fill="#fff" stroke="var(--rose)" stroke-width="2"/>
+    <circle cx="50" cy="46" r="11" fill="var(--rose)"/>
+    <path d="M50 51c-3-2.4-5.5-4.2-5.5-6.5a2.8 2.8 0 014.8-1.8l.7.7.7-.7a2.8 2.8 0 014.8 1.8c0 2.3-2.5 4.1-5.5 6.5z" fill="#FFFCF6"/>
+    <g fill="var(--gold)">
+      <circle class="twinkle" cx="18" cy="28" r="2"/>
+      <circle class="twinkle" cx="82" cy="32" r="1.6"/>
+      <circle class="twinkle" cx="26" cy="78" r="1.4"/>
+    </g></svg>`,
+
   bilet:`<svg class="art" viewBox="0 0 100 100" fill="none">
     <circle cx="50" cy="50" r="30" fill="#fff" stroke="var(--gold)" stroke-width="2"/>
     <circle cx="50" cy="50" r="24" stroke="var(--rose-soft)" stroke-width="1.5" stroke-dasharray="3 4"/>
@@ -171,10 +198,10 @@ const ART = {
     </g></svg>`
 };
 const gorsel=()=>CONFIG.foto?`<img class="avatar" src="${CONFIG.foto}" alt="">`:ART.zarf;
-const noktalar=n=>`<div class="steps">${[0,1,2,3,4].map(i=>`<i class="dot ${i===n?'on':''}"></i>`).join('')}</div>`;
+const noktalar=n=>`<div class="steps">${Array.from({length:ADIM_SAYISI},(_, i)=>`<i class="dot ${i===n?'on':''}"></i>`).join('')}</div>`;
 const geri=fn=>{const g=document.getElementById('geri'); if(g) g.onclick=e=>{e.preventDefault();fn()}};
 
-/* ── kaçan buton: asla pes etmez ── */
+/* ── kaçan buton ── */
 function yerlestir(){
   const c=card.getBoundingClientRect();
   noBtn.style.left=(c.left+c.width/2-52)+'px';
@@ -227,7 +254,7 @@ function adim1(){
   geri(adim0);
 }
 
-/* ── 2 · gün ── */
+/* ── 2 · gün + saat ── */
 function adim2(){
   noBtn.classList.add('hide');
   card.innerHTML=`
@@ -257,29 +284,78 @@ function adim3(){
     <h1>Ne içiyorsun?</h1>
     <p class="sub">Mekânı buna göre seçeceğim, o yüzden dikkatli ol.</p>
     <div class="grid">${icecekler.map((y,i)=>`<button class="tile" data-i="${i}" aria-pressed="${y.t===state.icecek}"><b>${y.e}</b>${y.t}</button>`).join('')}</div>
-    <button class="btn" id="bitir" ${state.icecek?'':'disabled'}>Tamamdır</button>
+    <button class="btn" id="ileri" ${state.icecek?'':'disabled'}>Devam et</button>
     <a class="ghost" href="#" id="geri">← Geri</a>
     ${noktalar(3)}`;
-  const b=document.getElementById('bitir');
+  const b=document.getElementById('ileri');
   card.querySelectorAll('.tile').forEach(el=>el.onclick=()=>{
     card.querySelectorAll('.tile').forEach(o=>o.setAttribute('aria-pressed','false'));
     el.setAttribute('aria-pressed','true');
     state.icecek=icecekler[el.dataset.i].t; b.disabled=false;
   });
-  b.onclick=()=>{patlat();adim4()};
+  b.onclick=()=>adim4();
   geri(adim2);
 }
 
-/* ── 4 · onay ── */
+/* ── 4 · mekân ── */
 function adim4(){
+  const ozelDeger=state.mekanOzel||'';
+  const secili=state.mekan;
+  card.innerHTML=`
+    <p class="eyebrow">Adım üç</p>
+    ${ART.pin}
+    <h1>Nerede buluşalım?</h1>
+    <p class="sub">Bir yer seç ya da aklındaki yeri yaz, gerisini bana bırak.</p>
+    <div class="grid2">${mekanlar.map((m,i)=>`<button class="tile" data-i="${i}" aria-pressed="${m.t===secili&&!ozelDeger}"><b>${m.e}</b>${m.t}</button>`).join('')}</div>
+    <div class="veya">ya da</div>
+    <input type="text" id="ozelMekan" placeholder="✏️ Şu kafe, şu ilçe, şu sokak…" value="${ozelDeger}">
+    <button class="btn" id="ileri" ${(secili||ozelDeger)?'':'disabled'}>Tamamdır</button>
+    <a class="ghost" href="#" id="geri">← Geri</a>
+    ${noktalar(4)}`;
+  const b=document.getElementById('ileri');
+  const inp=document.getElementById('ozelMekan');
+  const tiles=card.querySelectorAll('.tile');
+
+  tiles.forEach(el=>el.onclick=()=>{
+    tiles.forEach(o=>o.setAttribute('aria-pressed','false'));
+    el.setAttribute('aria-pressed','true');
+    state.mekan=mekanlar[el.dataset.i].t;
+    state.mekanOzel='';
+    inp.value='';
+    b.disabled=false;
+  });
+
+  inp.addEventListener('input',()=>{
+    const v=inp.value.trim();
+    if(v){
+      tiles.forEach(o=>o.setAttribute('aria-pressed','false'));
+      state.mekanOzel=v;
+      state.mekan=v;
+      b.disabled=false;
+    } else {
+      state.mekanOzel='';
+      /* hiçbiri seçili değilse butonu kapat */
+      const herhangi=[...tiles].some(t=>t.getAttribute('aria-pressed')==='true');
+      if(!herhangi){state.mekan=''; b.disabled=true;}
+    }
+  });
+
+  b.onclick=()=>{patlat();adim5()};
+  geri(adim3);
+}
+
+/* ── 5 · onay ── */
+function adim5(){
   kalpler(24);
   const dt=new Date(state.tarih);
   const gun=dt.toLocaleDateString('tr-TR',{day:'numeric',month:'long',weekday:'long'});
+  const mekanYazi=state.mekan==='Sen karar ver'?'Sürpriz — sen karar ver 🎲':state.mekan;
   const mesaj=encodeURIComponent(
 `Tamam, kabul ediyorum ☕
 
 ${gun} · ${state.saat}
 Benimki ${state.icecek.toLowerCase()} olsun, not aldın değil mi?
+Mekân: ${mekanYazi}
 
 Şimdi bak: sırf bana site kurduğun için evet dedim sanma. Ama kurmasaydın bu kadar hızlı da demezdim. İyi düşünmüşsün 😌
 
@@ -294,14 +370,15 @@ Kaçan butonu yakalamaya çalıştım bu arada. Olmadı.`);
         <div class="row"><dt>Gün</dt><dd>${gun}</dd></div>
         <div class="row"><dt>Saat</dt><dd>${state.saat}</dd></div>
         <div class="row"><dt>Kahven</dt><dd>${state.icecek}</dd></div>
+        <div class="row"><dt>Mekân</dt><dd>${mekanYazi}</dd></div>
       </dl>
     </div>
     <br>
     <a class="btn" href="https://wa.me/${CONFIG.telefon}?text=${mesaj}" target="_blank" rel="noopener">Cevabımı gönder</a>
     <a class="ghost" href="${takvimLinki(dt)}" target="_blank" rel="noopener">📅 Takvimime ekle</a><br>
     <a class="ghost" href="#" id="geri">← Seçimimi değiştir</a>
-    ${noktalar(4)}`;
-  geri(adim3);
+    ${noktalar(5)}`;
+  geri(adim4);
 }
 
 /* ── konfeti ── */
@@ -334,7 +411,7 @@ function takvimLinki(dt){
   const bas=new Date(dt); bas.setHours(+h,+m,0,0);
   const bit=new Date(bas.getTime()+1.5*36e5);
   const f=d=>d.toISOString().replace(/[-:]|\.\d{3}/g,'');
-  const detay=encodeURIComponent('Kahve randevusu ☕ — '+state.icecek);
+  const detay=encodeURIComponent('Kahve randevusu ☕ — '+state.icecek+' · '+state.mekan);
   return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent('Kahve ☕')}&dates=${f(bas)}/${f(bit)}&details=${detay}`;
 }
 
