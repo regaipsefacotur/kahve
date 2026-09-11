@@ -90,10 +90,7 @@
 
   /* kedi */
   .kedi-wrap{position:relative;width:100%;max-width:430px}
-  .kedi{position:absolute;bottom:-16px;right:22px;width:48px;height:48px;z-index:2;pointer-events:none;
-    animation:sway 5s ease-in-out infinite}
-  .kedi .goz{animation:gblink 4s ease-in-out infinite}
-  @keyframes gblink{0%,90%,100%{transform:scaleY(1)}94%{transform:scaleY(.08)}}
+  #kediCanvas{position:absolute;bottom:-32px;right:4px;width:120px;height:144px;z-index:2;pointer-events:none}
 
   /* çizim animasyonları */
   .steam{animation:steam 3s ease-in-out infinite}
@@ -114,21 +111,7 @@
 <div id="konfeti" aria-hidden="true"></div>
 <div class="kedi-wrap">
   <main class="card" id="card"></main>
-  <svg class="kedi" id="kedi" viewBox="0 0 52 48" fill="none" aria-hidden="true">
-    <path d="M8 22L15 6L22 22" fill="var(--rose-soft)" stroke="var(--rose)" stroke-width="1.2"/>
-    <path d="M30 22L37 6L44 22" fill="var(--rose-soft)" stroke="var(--rose)" stroke-width="1.2"/>
-    <path d="M11 20L15 10L19 20" fill="var(--rose)" opacity=".25"/>
-    <path d="M33 20L37 10L41 20" fill="var(--rose)" opacity=".25"/>
-    <ellipse cx="26" cy="32" rx="19" ry="16" fill="var(--card)" stroke="var(--rose)" stroke-width="1.2"/>
-    <g class="goz"><ellipse cx="18" cy="29" rx="2.6" ry="2.6" fill="var(--ink)"/><circle cx="19.2" cy="28" r=".9" fill="#fff"/></g>
-    <g class="goz"><ellipse cx="34" cy="29" rx="2.6" ry="2.6" fill="var(--ink)"/><circle cx="35.2" cy="28" r=".9" fill="#fff"/></g>
-    <path d="M24 34L26 36L28 34" fill="var(--rose)"/>
-    <path d="M22 37.5Q26 40 30 37.5" stroke="var(--rose)" stroke-width=".8" fill="none" stroke-linecap="round"/>
-    <g opacity=".4" stroke="var(--ink-soft)" stroke-width=".6">
-      <line x1="3" y1="31" x2="15" y2="32"/><line x1="3" y1="35" x2="15" y2="34"/>
-      <line x1="37" y1="32" x2="49" y2="31"/><line x1="37" y1="34" x2="49" y2="35"/>
-    </g>
-  </svg>
+  <canvas id="kediCanvas" width="200" height="240" aria-hidden="true"></canvas>
 </div>
 <button class="no-btn hide" id="noBtn">hayır</button>
 
@@ -460,6 +443,396 @@ function kalpler(n){
 
 addEventListener('resize',()=>{if(!noBtn.classList.contains('hide')&&kacis===0)yerlestir()});
 adim0();
+
+/* ═══════ Canvas Kedi ═══════ */
+(function(){
+  const cv=document.getElementById('kediCanvas');
+  if(!cv)return;
+  const C=cv.getContext('2d');
+  const W=cv.width, H=cv.height;
+  // renk paleti
+  const FUR='#F5E6D3';       // krem tüy
+  const FUR_DARK='#E0CDB8';  // gölge tüy
+  const FUR_LIGHT='#FFF5EA'; // açık highlight
+  const PINK='#E8A0BB';      // kulak içi / burun
+  const NOSE='#D4788E';      // burun koyu
+  const EYE='#5B7A52';       // yeşil göz
+  const PUPIL='#1E2720';     // göz bebeği
+  const MOUTH='#C27D8F';     // ağız
+  const WHISKER='#A08577';   // bıyık
+
+  let t=0, entranceT=0;
+  const ENTRANCE_DUR=900; // ms
+  let startTime=null;
+
+  function ease(x){return x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2}
+
+  // smoothstep
+  function ss(lo,hi,x){const t=Math.max(0,Math.min(1,(x-lo)/(hi-lo)));return t*t*(3-2*t)}
+
+  // blink pattern: mostly open, quick blink
+  function blinkY(t){
+    const cycle=t%4500;
+    if(cycle<200) return 1-ss(0,100,cycle)+ss(100,200,cycle);
+    if(cycle>4200) return 1-ss(4200,4350,cycle)+ss(4350,4500,cycle);
+    return 1;
+  }
+
+  function draw(now){
+    if(!startTime)startTime=now;
+    const elapsed=now-startTime;
+    t=elapsed;
+
+    // entrance slide-up
+    const ep=Math.min(1,elapsed/ENTRANCE_DUR);
+    const slide=ease(ep);
+    const offsetY=(1-slide)*60;
+    const alpha=slide;
+
+    C.clearRect(0,0,W,H);
+    C.globalAlpha=alpha;
+    C.save();
+    C.translate(0,offsetY);
+
+    // breathing
+    const breathe=Math.sin(t/1200)*0.008;
+    // head tilt
+    const headTilt=Math.sin(t/3500)*0.06;
+    // tail sway
+    const tailAngle=Math.sin(t/1100)*0.35;
+    // ear twitch
+    const earL=Math.sin(t/2800)*0.08;
+    const earR=Math.sin(t/3200+1.5)*0.08;
+    // whisker sway
+    const whiskL=Math.sin(t/1500)*0.04;
+    const whiskR=Math.sin(t/1700)*0.04;
+    // blink
+    const blink=blinkY(t);
+    // purr vibrate
+    const purr=Math.sin(t/80)*0.3;
+
+    const cx=W/2, baseY=H*0.92;
+
+    // ── Kuyruk ──
+    C.save();
+    C.translate(cx-28, baseY-52);
+    C.rotate(tailAngle);
+    C.beginPath();
+    C.moveTo(0, 0);
+    C.bezierCurveTo(-30, -20, -42, -55, -28, -78);
+    C.bezierCurveTo(-22, -88, -12, -82, -16, -72);
+    C.bezierCurveTo(-22, -58, -32, -28, -4, -6);
+    C.closePath();
+    const tg=C.createLinearGradient(-20,-78,0,0);
+    tg.addColorStop(0,FUR_DARK);
+    tg.addColorStop(0.5,FUR);
+    tg.addColorStop(1,FUR_DARK);
+    C.fillStyle=tg;
+    C.fill();
+    // tail tip
+    C.beginPath();
+    C.arc(-22,-78,5,0,Math.PI*2);
+    C.fillStyle=FUR_LIGHT;
+    C.fill();
+    // stripes on tail
+    C.strokeStyle='rgba(180,155,130,0.18)';
+    C.lineWidth=2.5;
+    for(let i=0;i<4;i++){
+      const ty=-15-i*14;
+      C.beginPath();
+      C.moveTo(-6+i*2,ty);
+      C.quadraticCurveTo(-18-i*3,ty-8,-12-i*4,ty-5);
+      C.stroke();
+    }
+    C.restore();
+
+    // ── Gövde ──
+    C.save();
+    C.translate(cx, baseY);
+    C.scale(1, 1+breathe);
+
+    // gövde shape
+    C.beginPath();
+    C.moveTo(-32, 0);
+    C.bezierCurveTo(-36, -20, -34, -55, -22, -68);
+    C.bezierCurveTo(-12, -78, 12, -78, 22, -68);
+    C.bezierCurveTo(34, -55, 36, -20, 32, 0);
+    C.closePath();
+    const bg=C.createRadialGradient(0,-40,8, 0,-35,50);
+    bg.addColorStop(0,FUR_LIGHT);
+    bg.addColorStop(0.6,FUR);
+    bg.addColorStop(1,FUR_DARK);
+    C.fillStyle=bg;
+    C.fill();
+
+    // göğüs beyazlık
+    C.beginPath();
+    C.ellipse(0,-28,14,22,0,0,Math.PI*2);
+    C.fillStyle='rgba(255,245,234,0.45)';
+    C.fill();
+
+    // tüy dokusu — ince çizgiler
+    C.strokeStyle='rgba(180,155,130,0.1)';
+    C.lineWidth=0.8;
+    for(let i=0;i<16;i++){
+      const angle=-2.8+i*0.35;
+      const r=28+Math.random()*6;
+      C.beginPath();
+      C.moveTo(Math.cos(angle)*18, -40+Math.sin(angle)*18);
+      C.lineTo(Math.cos(angle)*r, -40+Math.sin(angle)*r);
+      C.stroke();
+    }
+
+    // tabletop stripes
+    C.strokeStyle='rgba(180,155,130,0.12)';
+    C.lineWidth=3;
+    for(let i=0;i<3;i++){
+      const sy=-50-i*8;
+      C.beginPath();
+      C.moveTo(-18+i*3,sy);
+      C.quadraticCurveTo(0,sy-6+i*2,18-i*3,sy);
+      C.stroke();
+    }
+
+    // ── Patiler ──
+    // sol pati
+    C.beginPath();
+    C.ellipse(-16, 0, 12, 7, -0.15, 0, Math.PI*2);
+    C.fillStyle=FUR;
+    C.fill();
+    C.beginPath();
+    C.ellipse(-16, 0, 12, 7, -0.15, 0, Math.PI*2);
+    C.strokeStyle=FUR_DARK;
+    C.lineWidth=1;
+    C.stroke();
+    // pati pad
+    drawPaw(C, -16, 2);
+
+    // sağ pati
+    C.beginPath();
+    C.ellipse(16, 0, 12, 7, 0.15, 0, Math.PI*2);
+    C.fillStyle=FUR;
+    C.fill();
+    C.beginPath();
+    C.ellipse(16, 0, 12, 7, 0.15, 0, Math.PI*2);
+    C.strokeStyle=FUR_DARK;
+    C.lineWidth=1;
+    C.stroke();
+    drawPaw(C, 16, 2);
+
+    C.restore();
+
+    // ── Kafa ──
+    C.save();
+    C.translate(cx, baseY-66+purr*0.15);
+    C.rotate(headTilt);
+
+    // ── Kulaklar ──
+    // sol kulak
+    C.save();
+    C.rotate(earL);
+    drawEar(C, -18, -22, -1);
+    C.restore();
+    // sağ kulak
+    C.save();
+    C.rotate(earR);
+    drawEar(C, 18, -22, 1);
+    C.restore();
+
+    // yüz oval
+    C.beginPath();
+    C.ellipse(0, 0, 28, 24, 0, 0, Math.PI*2);
+    const fg=C.createRadialGradient(-4,-4,3, 0,0,28);
+    fg.addColorStop(0, FUR_LIGHT);
+    fg.addColorStop(0.5, FUR);
+    fg.addColorStop(1, FUR_DARK);
+    C.fillStyle=fg;
+    C.fill();
+
+    // yanak tüyü — yanaklar
+    C.beginPath();
+    C.ellipse(-18, 6, 10, 7, -0.2, 0, Math.PI*2);
+    C.fillStyle='rgba(255,245,234,0.35)';
+    C.fill();
+    C.beginPath();
+    C.ellipse(18, 6, 10, 7, 0.2, 0, Math.PI*2);
+    C.fill();
+
+    // yüz tüy dokusu
+    C.strokeStyle='rgba(180,155,130,0.08)';
+    C.lineWidth=0.6;
+    for(let i=0;i<12;i++){
+      const a=-3+i*0.5;
+      const r=20+Math.random()*6;
+      C.beginPath();
+      C.moveTo(Math.cos(a)*14, Math.sin(a)*12);
+      C.lineTo(Math.cos(a)*r, Math.sin(a)*r);
+      C.stroke();
+    }
+
+    // ── Gözler ──
+    drawEye(C, -10, -3, blink, false);
+    drawEye(C, 10, -3, blink, true);
+
+    // ── Burun ──
+    C.beginPath();
+    C.moveTo(0, 6);
+    C.bezierCurveTo(-3.5, 5, -4, 7, -3, 9);
+    C.bezierCurveTo(-1, 10.5, 1, 10.5, 3, 9);
+    C.bezierCurveTo(4, 7, 3.5, 5, 0, 6);
+    C.closePath();
+    const ng=C.createRadialGradient(0,8,1, 0,8,4);
+    ng.addColorStop(0,NOSE);
+    ng.addColorStop(1,PINK);
+    C.fillStyle=ng;
+    C.fill();
+    // burun shine
+    C.beginPath();
+    C.ellipse(-1, 7.5, 1.2, 0.8, -0.3, 0, Math.PI*2);
+    C.fillStyle='rgba(255,255,255,0.35)';
+    C.fill();
+
+    // ── Ağız ──
+    C.beginPath();
+    C.moveTo(0, 10);
+    C.lineTo(0, 13);
+    C.strokeStyle=MOUTH;
+    C.lineWidth=1;
+    C.lineCap='round';
+    C.stroke();
+    C.beginPath();
+    C.moveTo(0, 13);
+    C.quadraticCurveTo(-5, 16, -8, 14);
+    C.strokeStyle=MOUTH;
+    C.lineWidth=0.9;
+    C.stroke();
+    C.beginPath();
+    C.moveTo(0, 13);
+    C.quadraticCurveTo(5, 16, 8, 14);
+    C.stroke();
+
+    // ── Bıyıklar ──
+    C.save();
+    C.rotate(whiskL);
+    drawWhiskers(C, -1, 10, -1);
+    C.restore();
+    C.save();
+    C.rotate(whiskR);
+    drawWhiskers(C, 1, 10, 1);
+    C.restore();
+
+    C.restore(); // head
+
+    C.restore(); // entrance translate
+    C.globalAlpha=1;
+    requestAnimationFrame(draw);
+  }
+
+  function drawPaw(c, x, y){
+    c.fillStyle=PINK;
+    c.globalAlpha*=0.5;
+    // big pad
+    c.beginPath();
+    c.ellipse(x, y+1, 4, 3, 0, 0, Math.PI*2);
+    c.fill();
+    // toes
+    for(let i=-1;i<=1;i++){
+      c.beginPath();
+      c.ellipse(x+i*4, y-2.5, 2, 1.8, 0, 0, Math.PI*2);
+      c.fill();
+    }
+    c.globalAlpha/=0.5;
+  }
+
+  function drawEar(c, x, y, dir){
+    c.beginPath();
+    c.moveTo(x-12*dir, y+16);
+    c.quadraticCurveTo(x-2*dir, y-24, x+4*dir, y-18);
+    c.quadraticCurveTo(x+14*dir, y-8, x+10*dir, y+16);
+    c.closePath();
+    const eg=c.createLinearGradient(x,y-20,x,y+16);
+    eg.addColorStop(0,FUR_DARK);
+    eg.addColorStop(1,FUR);
+    c.fillStyle=eg;
+    c.fill();
+    // kulak içi
+    c.beginPath();
+    c.moveTo(x-7*dir, y+10);
+    c.quadraticCurveTo(x-1*dir, y-16, x+3*dir, y-12);
+    c.quadraticCurveTo(x+9*dir, y-3, x+6*dir, y+10);
+    c.closePath();
+    c.fillStyle='rgba(232,160,187,0.35)';
+    c.fill();
+  }
+
+  function drawEye(c, x, y, blink, isRight){
+    // göz beyazı
+    c.beginPath();
+    c.ellipse(x, y, 7, 6.5*blink, 0, 0, Math.PI*2);
+    c.fillStyle='#FEFEFE';
+    c.fill();
+    if(blink<0.15)return;
+    // iris
+    const irisR=4.5;
+    c.beginPath();
+    c.ellipse(x+0.5, y+0.3, irisR, irisR*blink, 0, 0, Math.PI*2);
+    const ig=c.createRadialGradient(x, y, 1, x, y, irisR);
+    ig.addColorStop(0, '#8DB580');
+    ig.addColorStop(0.5, EYE);
+    ig.addColorStop(1, '#3E5636');
+    c.fillStyle=ig;
+    c.fill();
+    // pupil
+    c.beginPath();
+    c.ellipse(x+0.5, y+0.3, 2, 3.5*blink, 0, 0, Math.PI*2);
+    c.fillStyle=PUPIL;
+    c.fill();
+    // reflection
+    c.beginPath();
+    c.ellipse(x-1.5, y-2, 1.8, 1.5*blink, -0.3, 0, Math.PI*2);
+    c.fillStyle='rgba(255,255,255,0.75)';
+    c.fill();
+    c.beginPath();
+    c.ellipse(x+2, y+1.5, 0.9, 0.7*blink, 0, 0, Math.PI*2);
+    c.fillStyle='rgba(255,255,255,0.4)';
+    c.fill();
+    // göz çevresi
+    c.beginPath();
+    c.ellipse(x, y, 7.2, 6.7*blink, 0, 0, Math.PI*2);
+    c.strokeStyle='rgba(120,90,70,0.15)';
+    c.lineWidth=0.8;
+    c.stroke();
+    // üst kirpik
+    if(blink>0.5){
+      c.strokeStyle='rgba(80,60,45,0.25)';
+      c.lineWidth=0.7;
+      for(let i=-2;i<=2;i++){
+        const a=-Math.PI/2+i*0.25;
+        c.beginPath();
+        c.moveTo(x+Math.cos(a)*6.5, y+Math.sin(a)*6*blink);
+        c.lineTo(x+Math.cos(a)*8.5, y+Math.sin(a)*8*blink);
+        c.stroke();
+      }
+    }
+  }
+
+  function drawWhiskers(c, dir, y, side){
+    c.strokeStyle=WHISKER;
+    c.lineWidth=0.7;
+    c.lineCap='round';
+    c.globalAlpha*=0.4;
+    for(let i=-1;i<=1;i++){
+      c.beginPath();
+      c.moveTo(side*8, y+i*2.5);
+      c.quadraticCurveTo(side*22, y+i*4-2, side*32, y+i*5-1);
+      c.stroke();
+    }
+    c.globalAlpha/=0.4;
+  }
+
+  // start after a short delay for entrance
+  setTimeout(()=>requestAnimationFrame(draw),400);
+})();
 </script>
 </body>
 </html>
