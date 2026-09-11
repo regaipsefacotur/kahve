@@ -90,7 +90,7 @@
 
   /* kedi */
   .kedi-wrap{position:relative;width:100%;max-width:430px}
-  #kediCanvas{position:absolute;bottom:-38px;left:0;width:100%;height:100px;z-index:2;pointer-events:none}
+  #kediCanvas{position:absolute;bottom:-50px;left:0;width:100%;height:140px;z-index:2;pointer-events:none}
 
   /* çizim animasyonları */
   .steam{animation:steam 3s ease-in-out infinite}
@@ -480,7 +480,7 @@ adim0();
   let speed=0.00012;
   let startTime=null;
   let prevTime=0;
-  const S=0.55; // ölçek
+  const S=0.82; // ölçek
 
   function ease(x){return x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2}
   function ss(lo,hi,x){const t=Math.max(0,Math.min(1,(x-lo)/(hi-lo)));return t*t*(3-2*t)}
