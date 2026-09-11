@@ -88,6 +88,13 @@
   .dot.on{background:var(--rose);width:18px;border-radius:3px}
   .hide{display:none}
 
+  /* kedi */
+  .kedi-wrap{position:relative;width:100%;max-width:430px}
+  .kedi{position:absolute;bottom:-16px;right:22px;width:48px;height:48px;z-index:2;pointer-events:none;
+    animation:sway 5s ease-in-out infinite}
+  .kedi .goz{animation:gblink 4s ease-in-out infinite}
+  @keyframes gblink{0%,90%,100%{transform:scaleY(1)}94%{transform:scaleY(.08)}}
+
   /* çizim animasyonları */
   .steam{animation:steam 3s ease-in-out infinite}
   .steam:nth-child(2){animation-delay:.5s}
@@ -105,7 +112,24 @@
 <body>
 <div class="sky" id="sky" aria-hidden="true"></div>
 <div id="konfeti" aria-hidden="true"></div>
-<main class="card" id="card"></main>
+<div class="kedi-wrap">
+  <main class="card" id="card"></main>
+  <svg class="kedi" id="kedi" viewBox="0 0 52 48" fill="none" aria-hidden="true">
+    <path d="M8 22L15 6L22 22" fill="var(--rose-soft)" stroke="var(--rose)" stroke-width="1.2"/>
+    <path d="M30 22L37 6L44 22" fill="var(--rose-soft)" stroke="var(--rose)" stroke-width="1.2"/>
+    <path d="M11 20L15 10L19 20" fill="var(--rose)" opacity=".25"/>
+    <path d="M33 20L37 10L41 20" fill="var(--rose)" opacity=".25"/>
+    <ellipse cx="26" cy="32" rx="19" ry="16" fill="var(--card)" stroke="var(--rose)" stroke-width="1.2"/>
+    <g class="goz"><ellipse cx="18" cy="29" rx="2.6" ry="2.6" fill="var(--ink)"/><circle cx="19.2" cy="28" r=".9" fill="#fff"/></g>
+    <g class="goz"><ellipse cx="34" cy="29" rx="2.6" ry="2.6" fill="var(--ink)"/><circle cx="35.2" cy="28" r=".9" fill="#fff"/></g>
+    <path d="M24 34L26 36L28 34" fill="var(--rose)"/>
+    <path d="M22 37.5Q26 40 30 37.5" stroke="var(--rose)" stroke-width=".8" fill="none" stroke-linecap="round"/>
+    <g opacity=".4" stroke="var(--ink-soft)" stroke-width=".6">
+      <line x1="3" y1="31" x2="15" y2="32"/><line x1="3" y1="35" x2="15" y2="34"/>
+      <line x1="37" y1="32" x2="49" y2="31"/><line x1="37" y1="34" x2="49" y2="35"/>
+    </g>
+  </svg>
+</div>
 <button class="no-btn hide" id="noBtn">hayır</button>
 
 <script>
@@ -116,7 +140,7 @@ const CONFIG = {
   telefon: "905322101161",
   saatler: ["12:00","13:00","14:00","15:00","16:00","17:00","18:00","19:00","20:00","21:00","22:00"],
   kapanis: "Anlaştık sayılır 🤝",
-  imza:    "Normal insanlar mesaj atar. Ben oturup sana site yaptım. Abartmıyorum, sadece çabamı gösteriyorum 😌✨"
+  imza:    "Normal insanlar mesaj atar. Ben oturup sana site yaptım. Kedilerin bile bu kadar ilgi beklemez 🐱"
 };
 /* ══════════════════════════════════════════ */
 
@@ -233,7 +257,7 @@ function adim0(){
     <p class="eyebrow">Bir dakikanı alacak</p>
     ${gorsel()}
     <h1>${CONFIG.isim}, sana bir şey sorabilir miyim?</h1>
-    <p class="sub">Kötü bir şey değil, söz. İki buton var ama birine çok güvenme, huysuz çıktı 😏</p>
+    <p class="sub">Kötü bir şey değil, söz. İki buton var ama birine çok güvenme, kedilerin kadar huysuz çıktı 🐱</p>
     <button class="btn" id="evet">Sor bakalım</button>
     ${noktalar(0)}`;
   sifirlaNo();
@@ -246,7 +270,7 @@ function adim1(){
     <p class="eyebrow">Soru şu</p>
     ${ART.fincan}
     <h1>Bir kahve içmeye ne dersin?</h1>
-    <p class="sub">Büyük bir mesele değil, sadece iki fincan ve biraz sohbet ☕ O buton hâlâ kaçıyor bu arada, yakalamayı dene 😄</p>
+    <p class="sub">Büyük bir mesele değil, sadece iki fincan ve güzel bir sohbet ☕ Kediler de onaylarsa tabii 🐾</p>
     <button class="btn" id="evet">Olur, içelim</button>
     <a class="ghost" href="#" id="geri">← Geri</a>
     ${noktalar(1)}`;
@@ -306,7 +330,7 @@ function adim4(){
     <p class="eyebrow">Adım üç</p>
     ${ART.pin}
     <h1>Nerede buluşalım?</h1>
-    <p class="sub">Bir yer seç ya da aklındaki yeri yaz. "Sen karar ver" de diyebilirsin, sürprizleri severim 🎁</p>
+    <p class="sub">Gezgin ruhun nereye çağırıyorsa oraya ✈️ Ya da bir yer yaz, kalanını bana bırak 🐾</p>
     <div class="grid2">${mekanlar.map((m,i)=>`<button class="tile" data-i="${i}" aria-pressed="${m.t===secili&&!ozelDeger}"><b>${m.e}</b>${m.t}</button>`).join('')}</div>
     <div class="veya">ya da</div>
     <input type="text" id="ozelMekan" placeholder="✏️ Şu kafe, şu ilçe, şu sokak…" value="${ozelDeger}">
@@ -417,16 +441,19 @@ function takvimLinki(dt){
   return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent('Kahve ☕')}&dates=${f(bas)}/${f(bit)}&details=${detay}`;
 }
 
+const yuzenler=['♥','♥','♥','🐾','🐾','✈️'];
 function kalpler(n){
   for(let i=0;i<n;i++){
-    const h=document.createElement('span'); h.textContent='♥';
+    const h=document.createElement('span');
+    h.textContent=yuzenler[Math.floor(Math.random()*yuzenler.length)];
     h.style.cssText=`left:${Math.random()*100}vw;font-size:${12+Math.random()*20}px;
       animation-duration:${3.5+Math.random()*3}s;animation-delay:${Math.random()*1.4}s;opacity:.45`;
     sky.appendChild(h); setTimeout(()=>h.remove(),8500);
   }
 }
-(function(){for(let i=0;i<9;i++){
-  const h=document.createElement('span'); h.textContent='♥';
+(function(){const bg=['♥','♥','🐾','🐾','✈️','♥','♥','🐾','♥'];
+  for(let i=0;i<bg.length;i++){
+  const h=document.createElement('span'); h.textContent=bg[i];
   h.style.cssText=`left:${Math.random()*100}vw;font-size:${10+Math.random()*11}px;
     animation-duration:${10+Math.random()*7}s;animation-delay:${Math.random()*9}s`;
   sky.appendChild(h);}})();
